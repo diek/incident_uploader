@@ -150,3 +150,114 @@ MEDIA_ROOT = BASE_DIR / "media"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Logging Configuration
+# https://docs.djangoproject.com/en/5.2/topics/logging/
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "[{levelname}] {asctime} {name} {module} {process:d} {thread:d} - {message}",
+            "style": "{",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+        },
+        "simple": {
+            "format": "[{levelname}] {asctime} {name} - {message}",
+            "style": "{",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+        },
+        # Uncomment below if you install python-json-logger
+        "json": {
+            "()": "pythonjsonlogger.jsonlogger.JsonFormatter",
+            "format": "%(asctime)s %(name)s %(levelname)s %(message)s %(pathname)s %(lineno)d",
+        },
+    },
+    "filters": {
+        "require_debug_false": {
+            "()": "django.utils.log.RequireDebugFalse",
+        },
+        "require_debug_true": {
+            "()": "django.utils.log.RequireDebugTrue",
+        },
+    },
+    "handlers": {
+        "console": {
+            "level": "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "simple",
+        },
+        "console_debug": {
+            "level": "DEBUG",
+            "filters": ["require_debug_true"],
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+        "file": {
+            "level": "INFO",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": BASE_DIR / "logs" / "django.log",
+            "maxBytes": 1024 * 1024 * 10,  # 10 MB
+            "backupCount": 5,
+            "formatter": "verbose",
+        },
+        "file_error": {
+            "level": "ERROR",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": BASE_DIR / "logs" / "django_error.log",
+            "maxBytes": 1024 * 1024 * 10,  # 10 MB
+            "backupCount": 5,
+            "formatter": "verbose",
+        },
+        "mail_admins": {
+            "level": "ERROR",
+            "filters": ["require_debug_false"],
+            "class": "django.utils.log.AdminEmailHandler",
+            "formatter": "verbose",
+        },
+    },
+    "loggers": {
+        # Root logger - catches everything
+        "": {
+            "handlers": ["console", "file"],
+            "level": "INFO",
+        },
+        # Django's own logger
+        "django": {
+            "handlers": ["console", "file", "file_error"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        # Django request logger - logs 4xx and 5xx responses
+        "django.request": {
+            "handlers": ["file_error", "mail_admins"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+        # Database queries logger (useful for debugging)
+        "django.db.backends": {
+            "handlers": ["console_debug"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
+        # Security related logger
+        "django.security": {
+            "handlers": ["file_error", "mail_admins"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+        # Your incidents app logger
+        "incidents": {
+            "handlers": ["console", "file", "file_error"],
+            "level": "DEBUG" if DEBUG else "INFO",
+            "propagate": False,
+        },
+        # Redis/Cache logger
+        "django_redis": {
+            "handlers": ["console", "file"],
+            "level": "INFO",
+            "propagate": False,
+        },
+    },
+}
