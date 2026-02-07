@@ -8,7 +8,7 @@ from django.core.management.base import BaseCommand
 from incidents.models import Location, Shift
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent
 
 
 class Command(BaseCommand):
