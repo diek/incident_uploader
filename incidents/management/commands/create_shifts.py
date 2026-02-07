@@ -16,6 +16,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         csv_path = BASE_DIR / "fixtures/shifts.dat"
+        print(f"csv path{csv_path}")
 
         # Load all users
         users = list(User.objects.all())
