@@ -1,19 +1,21 @@
 import csv
-import os
 import random
+from pathlib import Path
 
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
 
 from incidents.models import Location, Shift
 
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
+
 
 class Command(BaseCommand):
     help = "Create shifts for all locations based on shifts.csv shift names"
 
     def handle(self, *args, **kwargs):
-        # Path to your shifts.csv
-        csv_path = os.path.join("shifts.csv")  # Adjust as needed
+        csv_path = BASE_DIR / "fixtures/shifts.dat"
 
         # Load all users
         users = list(User.objects.all())
