@@ -5,7 +5,10 @@ build/
 dist/
 wheels/
 *.egg-info
+
+# Media
 media/cache
+media/incident_reports
 
 # Virtual environments
 .venv
