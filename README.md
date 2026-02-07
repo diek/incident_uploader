@@ -26,10 +26,10 @@ Allows attaching multiple images to an incident report, with support for orderin
 
 ## Setup Instructions
 
-### Prerequisites
+### Prerequisites, see pyproject.toml for complete requirements
 
 - Python 3.x
-- Django 3.x or later
+- Django 5.2 or later
 - Pillow (for image handling)
 - UV (the modern dependency manager)
 
@@ -37,4 +37,10 @@ Allows attaching multiple images to an incident report, with support for orderin
 
 
 ```bash
-pip install uv
+gh repo clone diek/incident_uploader
+cd incident_uploader
+uv venv
+source .venv/bin/activate.fish
+uv sync
+```
+
