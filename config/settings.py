@@ -12,15 +12,12 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 
-import environ
+from environs import env
+
+env.read_env()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-env = environ.Env(
-    DEBUG=(bool, False),
-)
-
-env.read_env(str(BASE_DIR / ".env"))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -33,9 +30,6 @@ DEBUG = env.bool("DJANGO_DEBUG", True)
 
 # Fix: Use env.list() to properly handle multiple hosts
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[])
-
-
-# Application definition
 
 INSTALLED_APPS = [
     "django.contrib.admin",
