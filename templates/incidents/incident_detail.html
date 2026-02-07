@@ -1,0 +1,471 @@
+<!-- templates/incident_detail.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incident Report #{{ incident.id }}</title>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .header .meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+
+        .actions {
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-secondary {
+            background-color: #95a5a6;
+        }
+
+        .btn-secondary:hover {
+            background-color: #7f8c8d;
+        }
+
+        .btn-danger {
+            background-color: #e74c3c;
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .info-item {
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        .info-item label {
+            display: block;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+            text-transform: uppercase;
+        }
+
+        .info-item .value {
+            color: #2c3e50;
+            font-size: 1.1em;
+        }
+
+        .categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .category-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            background-color: #3498db;
+            color: white;
+            border-radius: 20px;
+            font-size: 0.85em;
+        }
+
+        .summary-box {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 4px;
+            border-left: 4px solid #3498db;
+        }
+
+        /* Image Upload Section */
+        .image-section {
+            background-color: #f8f9fa;
+            padding: 25px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+
+        .upload-form {
+            background: white;
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+            border: 2px dashed #ddd;
+        }
+
+        .upload-form input[type="file"] {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .upload-form input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .preview-container {
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        #preview {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .image-item {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+
+        .image-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .image-item img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .image-item-content {
+            padding: 15px;
+        }
+
+        .image-item .caption {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .image-item .timestamp {
+            color: #7f8c8d;
+            font-size: 0.85em;
+            margin-bottom: 10px;
+        }
+
+        .image-item .delete-btn {
+            width: 100%;
+        }
+
+        .htmx-indicator {
+            display: none;
+        }
+
+        .htmx-request .htmx-indicator {
+            display: inline-block;
+        }
+
+        .htmx-request.upload-form {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #95a5a6;
+        }
+
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Incident Report #{{ incident.id }}</h1>
+            <div class="meta">
+                <strong>Created:</strong> {{ incident.created_at|date:"F j, Y, g:i a" }} |
+                <strong>Last Updated:</strong> {{ incident.updated_at|date:"F j, Y, g:i a" }}
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="actions">
+            <a href="{% url 'incident_list' %}" class="btn btn-secondary">← Back to List</a>
+
+        </div>
+
+        <!-- Incident Details -->
+        <div class="section">
+            <h2>Incident Information</h2>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <label>Date & Time</label>
+                    <div class="value">{{ incident.date_time_incident|date:"F j, Y, g:i a" }}</div>
+                </div>
+
+                <div class="info-item">
+                    <label>Shift</label>
+                    <div class="value">{{ incident.shift }}</div>
+                </div>
+
+                {% if incident.police_file_number %}
+                <div class="info-item">
+                    <label>Police File Number</label>
+                    <div class="value">{{ incident.police_file_number }}</div>
+                </div>
+                {% endif %}
+
+                {% if incident.merchandise_cost %}
+                <div class="info-item">
+                    <label>Merchandise Cost</label>
+                    <div class="value">${{ incident.merchandise_cost }}</div>
+                </div>
+                {% endif %}
+
+                <div class="info-item">
+                    <label>Number of Persons</label>
+                    <div class="value">
+                        {{ incident.number_persons }}
+                        {% if incident.is_multiple_person %}(Multiple People){% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Categories -->
+            <div class="info-item">
+                <label>Categories</label>
+                <div class="categories">
+                    {% if incident.is_theft %}<span class="category-badge">Theft</span>{% endif %}
+                    {% if incident.is_deterrence %}<span class="category-badge">Deterrence</span>{% endif %}
+                    {% if incident.is_trespass %}<span class="category-badge">Trespass</span>{% endif %}
+                    {% if incident.is_apprehension %}<span class="category-badge">Apprehension</span>{% endif %}
+                    {% if incident.is_violence %}<span class="category-badge">Violence</span>{% endif %}
+                    {% if incident.is_ohs %}<span class="category-badge">OH&S</span>{% endif %}
+                    {% if incident.is_other %}<span class="category-badge">Other</span>{% endif %}
+                </div>
+            </div>
+
+            <!-- Summary -->
+            <div class="info-item">
+                <label>Summary</label>
+                <div class="summary-box">{{ incident.summary|linebreaks }}</div>
+            </div>
+
+            {% if incident.merchandise_description %}
+            <div class="info-item">
+                <label>Merchandise Description</label>
+                <div class="summary-box">{{ incident.merchandise_description|linebreaks }}</div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Contact Information -->
+        {% if incident.person or incident.guardian %}
+        <div class="section">
+            <h2>Contact Information</h2>
+
+            <div class="info-grid">
+                {% if incident.person %}
+                <div class="info-item">
+                    <label>Person Involved</label>
+                    <div class="value">{{ incident.person }}</div>
+                </div>
+                {% endif %}
+
+                {% if incident.guardian %}
+                <div class="info-item">
+                    <label>Guardian</label>
+                    <div class="value">{{ incident.guardian }}</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Images Section -->
+        <div class="section image-section">
+            <h2>Evidence Photos</h2>
+
+            <!-- Upload Form -->
+            <form
+                class="upload-form"
+                hx-post="{% url 'upload_incident_image' incident.id %}"
+                hx-target="#image-grid"
+                hx-swap="afterbegin"
+                hx-on::after-request="if(event.detail.successful) this.reset(); document.getElementById('preview').style.display='none';"
+                enctype="multipart/form-data"
+            >
+                {% csrf_token %}
+
+                <h3 style="margin-bottom: 15px;">Upload New Image</h3>
+
+                <div class="preview-container">
+                    <img id="preview" style="display: none;" alt="Preview">
+                </div>
+
+                <input
+                    type="file"
+                    name="image"
+                    accept="image/*"
+                    required
+                    onchange="previewImage(this)"
+                >
+
+                <input
+                    type="text"
+                    name="caption"
+                    placeholder="Add a caption (optional)"
+                    maxlength="255"
+                >
+
+                <button type="submit" class="btn">
+                    Upload Image
+                    <span class="htmx-indicator spinner"></span>
+                </button>
+            </form>
+
+            <!-- Image Grid -->
+            <div id="image-grid" class="image-grid">
+                {% for image in incident.images.all %}
+                    {% include 'incidents/partials/incident_image_item.html' %}
+                {% empty %}
+                    <div class="empty-state" id="empty-state">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <p>No images uploaded yet</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function previewImage(input) {
+            const preview = document.getElementById('preview');
+            const emptyState = document.getElementById('empty-state');
+
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // Remove empty state when first image is added
+        document.body.addEventListener('htmx:afterSwap', function(event) {
+            const emptyState = document.getElementById('empty-state');
+            if (emptyState && document.querySelectorAll('.image-item').length > 0) {
+                emptyState.remove();
+            }
+        });
+    </script>
+</body>
+</html>

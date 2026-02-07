@@ -1,0 +1,30 @@
+[project]
+name = "incident-uploader"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "django==5.2",
+    "django-extensions>=4.1",
+    "django-redis>=6.0.0",
+    "faker>=40.1.2",
+    "pillow>=12.1.0",
+    "redis>=7.1.0",
+    "sorl-thumbnail>=13.0.0",
+    "werkzeug>=3.1.5",
+]
+
+[tool.ruff]
+line-length = 102
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+fixable = ["ALL"]
+unfixable = []
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"

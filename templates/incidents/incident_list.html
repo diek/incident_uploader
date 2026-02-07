@@ -1,0 +1,317 @@
+<!-- templates/incident_list.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incident Reports</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        .header-stats {
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-success {
+            background-color: #27ae60;
+        }
+
+        .btn-success:hover {
+            background-color: #229954;
+        }
+
+        /* Table Styles */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        thead {
+            background-color: #34495e;
+            color: white;
+        }
+
+        th {
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9em;
+            text-transform: uppercase;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        tbody tr {
+            transition: background-color 0.2s;
+        }
+
+        tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 500;
+        }
+
+        .badge-theft {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .badge-no-theft {
+            background-color: #95a5a6;
+            color: white;
+        }
+
+        .badge-multiple {
+            background-color: #f39c12;
+            color: white;
+        }
+
+        .badge-single {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .summary-preview {
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: #555;
+        }
+
+        .actions-cell {
+            white-space: nowrap;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 0.85em;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #95a5a6;
+        }
+
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state h2 {
+            color: #7f8c8d;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            margin-bottom: 20px;
+        }
+
+        .image-count {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+
+        .image-count svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .cost-cell {
+            font-weight: 600;
+            color: #27ae60;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            table {
+                font-size: 0.9em;
+            }
+
+            th, td {
+                padding: 8px;
+            }
+
+            .summary-preview {
+                max-width: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1>Incident Reports</h1>
+                <div class="header-stats">
+                    Total Reports: {{ incidents.count }}
+                </div>
+            </div>
+            <a href="{% url 'create_incident_report' %}" class="btn btn-success">+ New Incident Report</a>
+        </div>
+
+        <!-- Incidents Table -->
+        {% if incidents %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Date & Time</th>
+                        <th>Shift</th>
+                        <th>Summary</th>
+                        <th>Theft</th>
+                        <th>Persons</th>
+                        <th>Cost</th>
+                        <th>Photos</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for incident in incidents %}
+                    <tr>
+                        <td><strong>#{{ incident.id }}</strong></td>
+                        <td>{{ incident.date_time_incident|date:"M d, Y g:i A" }}</td>
+                        <td>{{ incident.shift }}</td>
+                        <td>
+                            <div class="summary-preview" title="{{ incident.summary }}">
+                                {{ incident.summary }}
+                            </div>
+                        </td>
+                        <td>
+                            {% if incident.is_theft %}
+                                <span class="badge badge-theft">Theft</span>
+                            {% else %}
+                                <span class="badge badge-no-theft">No Theft</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if incident.is_multiple_person %}
+                                <span class="badge badge-multiple">{{ incident.number_persons }} People</span>
+                            {% else %}
+                                <span class="badge badge-single">{{ incident.number_persons }} Person</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if incident.merchandise_cost %}
+                                <span class="cost-cell">${{ incident.merchandise_cost }}</span>
+                            {% else %}
+                                <span style="color: #95a5a6;">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="image-count">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                {{ incident.images.count }}
+                            </span>
+                        </td>
+                        <td class="actions-cell">
+                            <a href="{% url 'incident_detail' incident.pk %}" class="btn btn-small">View Details</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <!-- Empty State -->
+        <div class="empty-state">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <h2>No Incident Reports Yet</h2>
+            <p>Get started by creating your first incident report.</p>
+            <a href="{% url 'create_incident_report' %}" class="btn btn-success">+ Create First Report</a>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

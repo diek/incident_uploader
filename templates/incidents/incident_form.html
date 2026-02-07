@@ -1,0 +1,29 @@
+<!-- incident_form.html -->
+{% load static %}
+
+<form method="post" id="incident-form">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save Incident Report</button>
+</form>
+
+<!-- Image upload section (only show after incident is created) -->
+{% if incident %}
+<div class="image-upload-section">
+    <h3>Upload Images</h3>
+
+    <!-- Existing images -->
+    <div id="image-list">
+        {% for image in incident.images.all %}
+            {% include 'partials/incident_image_item.html' %}
+        {% endfor %}
+    </div>
+
+    <!-- Upload form -->
+    <div id="upload-form-container">
+        {% include 'partials/image_upload_form.html' %}
+    </div>
+</div>
+{% endif %}
+
+<script src="https://unpkg.com/htmx.org@1.9.10"></script>
