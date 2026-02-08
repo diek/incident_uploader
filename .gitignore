@@ -5,6 +5,7 @@ build/
 dist/
 wheels/
 *.egg-info
+*.bak
 
 # Media
 media/cache
